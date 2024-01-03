@@ -1,6 +1,8 @@
 package models
 
 import (
+	"fmt"
+
 	"github.com/jinzhu/gorm"
 
 	"github.com/Deatsilence/go-infdic-service/pkg/config"
@@ -22,9 +24,10 @@ func init() {
 	db = config.GetDB()
 }
 
-func GetAllWords() []WordTranslate {
+func GetMeansOfTheWord(word string) []WordTranslate {
 	var words []WordTranslate
-	utils.GetAllWordsQuery(db).Find(&words)
+	fmt.Println("word:", word)
+	utils.GetMeansOfAWordQuery(db, word).Find(&words)
 
 	return words
 }

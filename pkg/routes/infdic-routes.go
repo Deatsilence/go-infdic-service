@@ -7,5 +7,6 @@ import (
 )
 
 var InfdicRoutes = func(router *mux.Router) {
-	router.HandleFunc("/dictionary", controllers.GetDictionary).Methods("GET")
+	// router.HandleFunc("/dictionary", controllers.GetDictionary).Methods("GET")
+	router.HandleFunc("/dictionary/{word}", controllers.GetDictionary).Methods("GET")
 }

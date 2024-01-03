@@ -4,12 +4,11 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
+// GetMeansOfAWordQuery returns a query that finds the means of a word.
 func GetMeansOfAWordQuery(db *gorm.DB, word string) *gorm.DB {
-	// SubQuery'yi tanımlayın ve çalıştırarak englishIds'yi elde edin
 	var englishIds []int
 	db.Table("english").Select("id").Where("word LIKE ?", word).Pluck("id", &englishIds)
 
-	// Ana sorguyu döndürün
 	return db.Table("translate").Select(
 		"translate.id as id, english.word as word_en, turkish.word as word_tr, type.name as type, category.name as category",
 	).Joins(

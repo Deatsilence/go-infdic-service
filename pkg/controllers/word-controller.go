@@ -13,7 +13,6 @@ func GetDictionary(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	word := vars["word"]
 	dictionary := models.GetMeansOfTheWord(word)
-	fmt.Println(len(dictionary))
 
 	res, err := json.Marshal(dictionary)
 
@@ -27,38 +26,30 @@ func GetDictionary(w http.ResponseWriter, r *http.Request) {
 	w.Write(res)
 }
 
-// func hasAudio(clearWords *[]models.WordTranslate) []models.WordTranslate {
-// 	if clearWords == nil {
-// 		return nil
-// 	}
+func HandleGetWordDefinition(w http.ResponseWriter, r *http.Request) {
 
-// 	var wg sync.WaitGroup
-// 	var wordsWithAudio []models.WordTranslate
-// 	var errors []error
+	vars := mux.Vars(r)
+	word := vars["word"]
 
-// 	for _, word := range *clearWords {
-// 		wg.Add(1)
+	resp, err := http.Get(fmt.Sprintf("https://api.dictionaryapi.dev/api/v2/entries/en/%s", word))
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
-// 		go func(word models.WordTranslate) {
-// 			defer wg.Done()
+	var wordDefinition []models.WordInformations
+	if err := json.NewDecoder(resp.Body).Decode(&wordDefinition); err != nil {
+		fmt.Println(err)
+		return
+	}
+	res, err := json.Marshal(wordDefinition)
 
-// 			response, err := http.Get("https://api.dictionaryapi.dev/api/v2/entries/en/" + word.WordEn)
-// 			if err != nil {
-// 				errors = append(errors, err)
-// 				return
-// 			}
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
-// 			if response.StatusCode == http.StatusOK {
-// 				wordsWithAudio = append(wordsWithAudio, word)
-// 			}
-// 		}(word)
-// 	}
-
-// 	wg.Wait()
-
-// 	if len(errors) > 0 {
-// 		return nil
-// 	}
-
-// 	return wordsWithAudio
-// }
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(res)
+}
